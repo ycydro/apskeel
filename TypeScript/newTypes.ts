@@ -85,3 +85,7 @@ const bathTodo = createBathingTodo({description: "Wash yourself cuh"})
 const bathTodo2 = createBathingTodo({description: "Wash yourself cuh"}) 
 // bathTodo2 ERRORS BECAUSE THE 'EXPECTED' PARAMETER TYPE OF 'createBathingTodo'
 // IS A 'Todo' TYPE WITHOUT A TITLE (BECAUSE TITLE IS 'OMITTED' FROM THE PARAMETER)
+
+// HOW TO GET TYPE OF A SPECIFIC PROPERTY OF A CUSTOM TYPE
+type TodoTitle = Todo["title"]
+// THIS EXTRACTS THE TYPE OF THE 'title' PROPERTY OF THE CUSTOM 'Todo' TYPE (SO NOW ITS A STRING)
