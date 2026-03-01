@@ -1,4 +1,3 @@
-
 // LITERAL TYPES
 let name1: string = "Bob";
 name1 = "Logan"; // I CAN CHANGE THE NAME OF THIS TO ANY 'STRING' TYPE BECAUSE
@@ -86,5 +85,3 @@ const bathTodo = createBathingTodo({description: "Wash yourself cuh"})
 const bathTodo2 = createBathingTodo({description: "Wash yourself cuh"}) 
 // bathTodo2 ERRORS BECAUSE THE 'EXPECTED' PARAMETER TYPE OF 'createBathingTodo'
 // IS A 'Todo' TYPE WITHOUT A TITLE (BECAUSE TITLE IS 'OMITTED' FROM THE PARAMETER)
-
-// GENERICS - SYNTAX -> '<>'
