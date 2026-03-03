@@ -51,8 +51,8 @@ const jobList: Job[] = [
     id: JOB_ID++,
     title: "Portfolio Website",
     client: clientList[2]!,
-    budget: 3,
-    status: "pending",
+    budget: 10,
+    status: "completed",
   },
   {
     id: JOB_ID++,
@@ -74,35 +74,35 @@ const paymentList: Payment[] = [
   {
     id: PAYMENT_ID++,
     job: jobList[0]!,
-    amount: 1,
+    amount: jobList[0]!.budget,
     date: "2026-02-01",
     status: "paid",
   },
   {
     id: PAYMENT_ID++,
     job: jobList[1]!,
-    amount: 2,
+    amount: jobList[1]!.budget,
     date: "2026-02-10",
     status: "unpaid",
   },
   {
     id: PAYMENT_ID++,
     job: jobList[2]!,
-    amount: 3,
+    amount: jobList[2]!.budget,
     date: "2026-02-15",
-    status: "unpaid",
+    status: "paid",
   },
   {
     id: PAYMENT_ID++,
     job: jobList[3]!,
-    amount: 4,
+    amount: jobList[3]!.budget,
     date: "2026-02-20",
     status: "unpaid",
   },
   {
     id: PAYMENT_ID++,
     job: jobList[4]!,
-    amount: 5,
+    amount: jobList[4]!.budget,
     date: "2026-02-25",
     status: "paid",
   },
@@ -344,7 +344,7 @@ function getTotalRevenuePerClient(): Result<any> {
           payment.job?.client?.id === client.id && payment.status === "paid",
       )
       .reduce((acc, payment) => acc + payment.amount, 0);
-    return { client: client.name, revenue };
+    return { client: client, revenue };
   });
   return {
     status: "success",
@@ -352,6 +352,94 @@ function getTotalRevenuePerClient(): Result<any> {
   };
 }
 
+function getTopPayingClient(): Result<Client> {
+  const clientsWithRevenue = getTotalRevenuePerClient();
+
+  if (clientsWithRevenue.status === "error") {
+    return {
+      status: "error",
+      message: "No clients available.",
+    };
+  }
+
+  let highestRevenue = 0;
+  let topPayingClient;
+
+  for (const client of clientsWithRevenue.data) {
+    if (client.revenue > highestRevenue) {
+      highestRevenue = client.revenue;
+      topPayingClient = client;
+    }
+  }
+
+  return {
+    status: "success",
+    data: topPayingClient,
+  };
+}
+
+// reporting
+function getJobsByStatus(status: Job["status"]): Result<Job[]> {
+  if (jobList.length <= 0) {
+    return {
+      status: "error",
+      message: "No jobs available.",
+    };
+  }
+
+  const jobs = jobList.filter((job) => job.status === status);
+
+  return {
+    status: "success",
+    data: jobs,
+  };
+}
+
+function getActiveClients(): Result<Client[]> {
+  if (clientList.length <= 0) {
+    return {
+      status: "error",
+      message: "No clients available.",
+    };
+  }
+  const clients = clientList.filter((client) => client.isActive === true);
+
+  return {
+    status: "success",
+    data: clients,
+  };
+}
+
+function getUnpaidPayments(): Result<Payment[]> {
+  if (paymentList.length <= 0) {
+    return {
+      status: "error",
+      message: "No payments available.",
+    };
+  }
+  const unpaidPayments = paymentList.filter(
+    (payment) => payment.status === "unpaid",
+  );
+
+  return {
+    status: "success",
+    data: unpaidPayments,
+  };
+}
+
+function getCompletedJobs(): Result<Job[]> {
+  if (jobList.length <= 0) {
+    return {
+      status: "error",
+      message: "No jobs available.",
+    };
+  }
+  const completedJobs = jobList.filter((job) => job.status === "completed");
+  return {
+    status: "success",
+    data: completedJobs,
+  };
+}
 // console.log(addClient({ name: "Hev", email: "hev@email.com", isActive: true }));
 // console.log("Client List: ", clientList);
 // console.log(deactiveClient(1));
@@ -361,3 +449,8 @@ function getTotalRevenuePerClient(): Result<any> {
 // console.log("Client List: ", clientList);
 // console.log("Job List: ", jobList);
 // console.log("Payment List: ", paymentList);
+console.log("Top Paying Client: ", getTopPayingClient());
+console.log("Jobs by 'completed' status: ", getJobsByStatus("completed"));
+console.log("Active Clients: ", getActiveClients());
+console.log("Unpaid Payments: ", getUnpaidPayments());
+console.log("Completed Jobs: ", getCompletedJobs());
