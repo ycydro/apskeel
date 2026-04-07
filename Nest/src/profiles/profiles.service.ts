@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID, UUID } from 'crypto';
 import type { Profile } from 'src/types';
 import { CreateProfileDTO } from './dto/create-profile-dto';
@@ -7,60 +7,68 @@ import { profile } from 'console';
 
 @Injectable()
 export class ProfilesService {
-    private profiles = [
-        {
-            id: randomUUID(),
-            name: 'LeBron',
-            description: 'GOAT'
-        },
-        {
-            id: randomUUID(),
-            name: 'Kyrie',
-            description: '2NDGOAT'
-        }
-    ]
+  private profiles = [
+    {
+      id: randomUUID(),
+      name: 'LeBron',
+      description: 'GOAT',
+    },
+    {
+      id: randomUUID(),
+      name: 'Kyrie',
+      description: '2NDGOAT',
+    },
+  ];
 
-    findAll() {
-        return this.profiles
-    }
-    
-    findOne(id: string) {
-        return this.profiles.find(profile => profile.id === id)
-    }
+  findAll() {
+    return this.profiles;
+  }
 
-    create(createProfileDTO: CreateProfileDTO) {
-        const newProfile = {id: randomUUID(), ...createProfileDTO}
+  findOne(id: string) {
+    const profile = this.profiles.find((profile) => profile.id === id);
 
-        this.profiles.push(newProfile);
-
-        return newProfile;
+    if (!profile) {
+      throw new Error(`Profile with id: ${id} not found.`);
     }
 
-    update(id: string, updateProfileDTO: UpdateProfileDTO) {
-        const profileIndex = this.profiles.findIndex(profile => profile.id === id)
+    return profile;
+  }
 
-        const profile = this.profiles[profileIndex]
+  create(createProfileDTO: CreateProfileDTO) {
+    const newProfile = { id: randomUUID(), ...createProfileDTO };
 
-        const {id: _ignoredId, ...rest} = profile
+    this.profiles.push(newProfile);
 
-        const updatedProfile = {
-            id: id as UUID,
-            ...rest,
-            ...updateProfileDTO
-        }
+    return newProfile;
+  }
 
-        this.profiles[profileIndex] = updatedProfile;
+  update(id: string, updateProfileDTO: UpdateProfileDTO) {
+    const profileIndex = this.profiles.findIndex(
+      (profile) => profile.id === id,
+    );
 
-        return updatedProfile;
-    }
+    const profile = this.profiles[profileIndex];
 
-    delete(id: string) {
-        const newList = this.profiles.filter(profile => profile.id !== id)
+    const { id: _ignoredId, ...rest } = profile;
 
-        this.profiles = newList
+    const updatedProfile = {
+      id: id as UUID,
+      ...rest,
+      ...updateProfileDTO,
+    };
 
-        return {
-            profiels: newList
-        }
-    }
+    this.profiles[profileIndex] = updatedProfile;
+
+    return updatedProfile;
+  }
+
+  delete(id: string) {
+    const newList = this.profiles.filter((profile) => profile.id !== id);
+
+    this.profiles = newList;
+
+    return {
+      profiles: newList,
+    };
+  }
 }
